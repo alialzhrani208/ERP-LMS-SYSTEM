@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Filament\Admin\Widgets;
+
+use App\Models\User; // تأكد من استيراد المودل
+use Filament\Widgets\StatsOverviewWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+
+class UsersCountWidget extends StatsOverviewWidget
+{
+    public static function canView(): bool
+{
+    return auth()->user()->can('View:UsersCountWidget');
+}
+
+    protected function getStats(): array
+    {
+        return [
+            // أضفنا البيانات هنا ليظهر المربع
+            Stat::make('عدد المستخدمين', User::count())
+                ->description('إجمالي المستخدمين')
+                ->descriptionIcon('heroicon-m-user-group')
+        ];
+    }
+}
