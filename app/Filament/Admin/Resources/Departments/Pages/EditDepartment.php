@@ -3,19 +3,19 @@
 namespace App\Filament\Admin\Resources\Departments\Pages;
 
 use App\Filament\Admin\Resources\Departments\DepartmentResource;
-use Filament\Actions\CreateAction;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Pages\EditRecord;
 
-class ListDepartments extends ListRecords
+class EditDepartment extends EditRecord
 {
     protected static string $resource = DepartmentResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-             ->label('إضافة قسم جديد')
-            ->icon('heroicon-m-plus'),
+            ViewAction::make(),
+            DeleteAction::make(),
         ];
     }
 }

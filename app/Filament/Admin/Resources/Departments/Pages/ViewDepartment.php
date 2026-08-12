@@ -2,13 +2,13 @@
 
 namespace App\Filament\Admin\Resources\Departments\Pages;
 
-use App\Filament\Admin\Resources\Departments\DepartmentsResource;
+use App\Filament\Admin\Resources\Departments\DepartmentResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-class ViewDepartments extends ViewRecord
+class ViewDepartment extends ViewRecord
 {
-    protected static string $resource = DepartmentsResource::class;
+    protected static string $resource = DepartmentResource::class;
 
     protected function getHeaderActions(): array
     {

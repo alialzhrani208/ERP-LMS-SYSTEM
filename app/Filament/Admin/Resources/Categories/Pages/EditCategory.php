@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Departments\Pages;
+namespace App\Filament\Admin\Resources\Categories\Pages;
 
-use App\Filament\Admin\Resources\Departments\DepartmentsResource;
+use App\Filament\Admin\Resources\Categories\CategoryResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditDepartments extends EditRecord
+class EditCategory extends EditRecord
 {
-    protected static string $resource = DepartmentsResource::class;
+    protected static string $resource = CategoryResource::class;
 
     protected function getHeaderActions(): array
     {

@@ -6,6 +6,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\FileUpload;
 
 class UserForm
 {
@@ -28,13 +29,21 @@ class UserForm
             ->dehydrated(fn ($state) => filled($state)) 
              ->required(fn (string $operation): bool => $operation === 'create'), // إجباري فقط عند إنشاء مستخدم جديد
                    
+             
 
                 Select::make('roles')
                 ->label('الصلاحية')
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->preload()
-                    ->visible(fn () => auth()->user()->hasRole('super_admin')), 
+                    ->visible(fn () => auth()->user()->hasRole('super_admin')),
+                 
+                    FileUpload::make('attachment')
+                    ->label('الملف المرفق')
+                    ->disk('public')
+                    ->directory('uploads')
+                    ->maxSize(5120)
+                    ->openable(),
             ]);
     }
 }

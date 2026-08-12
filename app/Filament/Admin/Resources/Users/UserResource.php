@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
@@ -29,7 +30,10 @@ class UserResource extends Resource
     {
         return UserForm::configure($schema);
     }
-
+   public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['roles']);
+    }
     public static function infolist(Schema $schema): Schema
     {
         return UserInfolist::configure($schema);

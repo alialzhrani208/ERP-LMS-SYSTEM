@@ -23,11 +23,18 @@ class UserInfolist
                 ->label('تاريخ التعديل')
                     ->dateTime()
                     ->placeholder('-'),
-                    TextEntry::make('password')
-                ->label('كلمة المرور'),
-               
                     TextEntry::make('roles.name')
-                ->label('الصلاحية') // عنوان الحقل
+                    ->label('الصلاحية') // عنوان الحقل
+                    ->badge()
+                    ->placeholder('لا توجد صلاحية'),
+                TextEntry::make('attachment')
+                    ->label('الملف المرفق')
+                    ->badge()
+                    ->state(fn ($record) => $record->attachment ? 'عرض الملف' : 'لا يوجد')
+                    ->color(fn ($record) => $record->attachment ? 'info' : 'gray')
+                    ->url(fn ($record) => $record->attachment ? asset('storage/' . $record->attachment) : null)
+                    ->openUrlInNewTab()
+                    ->placeholder('لا يوجد'),
             ]);
     }
 }
