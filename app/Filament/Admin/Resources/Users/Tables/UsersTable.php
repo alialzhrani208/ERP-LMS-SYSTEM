@@ -39,15 +39,7 @@ class UsersTable
                     ->placeholder('لا توجد صلاحية')
                     ->label('الصلاحية'),
                     
-                    TextColumn::make('attachment')
-                   ->label('الملف المرفق')
-                    ->badge()
-                   ->state(fn ($record) => $record->attachment ? 'عرض الملف' : 'لا يوجد')
-                      // 2. تحديد اللون (أزرق لو فيه ملف، رمادي لو ما فيه)
-                   ->color(fn ($record) => $record->attachment ? 'info' : 'gray')
-                      // 3. الرابط يعمل فقط إذا كان هناك ملف
-                   ->url(fn ($record) => $record->attachment ? asset('storage/' . $record->attachment) : null)
-                    ->openUrlInNewTab(),                    
+                         
                    TextColumn::make('created_at')
                 ->label('تاريخ الانشاء')
                     ->dateTime()

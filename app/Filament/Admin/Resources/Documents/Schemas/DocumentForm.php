@@ -9,6 +9,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Hidden; // تأكد من استدعاء هذا الكلاس في الأعلى
 
 class DocumentForm
 {
@@ -71,6 +72,8 @@ class DocumentForm
                     ->label('ملاحظات أو ملخص')
                     ->default(null)
                     ->columnSpanFull(),
+                    Hidden::make('user_id')
+                  ->default(auth()->id()),
             ]);
     }
 }

@@ -6,7 +6,6 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\FileUpload;
 
 class UserForm
 {
@@ -38,12 +37,7 @@ class UserForm
                     ->preload()
                     ->visible(fn () => auth()->user()->hasRole('super_admin')),
                  
-                    FileUpload::make('attachment')
-                    ->label('الملف المرفق')
-                    ->disk('public')
-                    ->directory('uploads')
-                    ->maxSize(5120)
-                    ->openable(),
+                    
             ]);
     }
 }

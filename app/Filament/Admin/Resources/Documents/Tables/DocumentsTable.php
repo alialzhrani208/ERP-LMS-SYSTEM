@@ -1,13 +1,21 @@
 <?php
 
 namespace App\Filament\Admin\Resources\Documents\Tables;
-
+use Filament\Actions\ActionGroup;
+use App\Filament\Exports\DocumentExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
+use App\Filament\Imports\DocumentImporter;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Table;
 
 class DocumentsTable
@@ -15,6 +23,7 @@ class DocumentsTable
     public static function configure(Table $table): Table
     {
         return $table
+          ->searchPlaceholder('ابحث بالاسم او الرقم فقط')
             ->columns([
                 TextColumn::make('title')
                     ->label('عنوان الوثيقة')
@@ -33,9 +42,8 @@ class DocumentsTable
 
                 // عرض اسم التصنيف بدلاً من الرقم
                 TextColumn::make('category.name')
-                    ->label('التصنيف')
-                    ->sortable()
-                    ->searchable(),
+                    ->label('التصنيف'),
+                    
 
                 // زر عرض الملف المرفق الاحترافي
                 TextColumn::make('attachment')
@@ -54,7 +62,6 @@ class DocumentsTable
 
                 TextColumn::make('expiry_date')
                 ->label('تاريخ الانتهاء')
-               
                 ->date()
                  ->placeholder('لا يوجد'),
                 // عرض اسم المستخدم الذي أرشف الوثيقة
@@ -73,7 +80,46 @@ class DocumentsTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->headerActions([
+            ActionGroup::make([
             
+             ExportAction::make()
+              ->label('تصدير كافة السجلات Excel')
+              ->icon('heroicon-o-arrow-up-tray')
+             ->exporter(DocumentExporter::class),
+            ImportAction::make()
+             ->label('استيراد من ملف Excel')
+            ->importer(DocumentImporter::class)
+            ->icon('heroicon-o-arrow-down-tray'),
+            ])
+            ])
+            ->filters([
+                //
+                Filter::make('document_date')
+    ->form([
+        DatePicker::make('from')->label('تاريخ الوثيقة من'),
+        DatePicker::make('until')->label('تاريخ الوثيقة إلى'),
+    ])
+    ->query(function (Builder $query, array $data): Builder {
+        return $query
+            ->when($data['from'], fn ($q, $date) => $q->whereDate('document_date', '>=', $date))
+            ->when($data['until'], fn ($q, $date) => $q->whereDate('document_date', '<=', $date));
+    }),
+
+// 2. فلتر حسب تاريخ انتهاء الوثيقة (expiry_date)
+Filter::make('expiry_date')
+    ->form([
+        DatePicker::make('from')->label('انتهاء الوثيقة من'),
+        DatePicker::make('until')->label('انتهاء الوثيقة إلى'),
+    ])
+    ->query(function (Builder $query, array $data): Builder {
+        return $query
+            ->when($data['from'], fn ($q, $date) => $q->whereDate('expiry_date', '>=', $date))
+            ->when($data['until'], fn ($q, $date) => $q->whereDate('expiry_date', '<=', $date));
+    }),
+
+
+    ])
              ->recordActions([
                 \Filament\Actions\ActionGroup::make([
                     ViewAction::make(),
@@ -86,6 +132,10 @@ class DocumentsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                 ExportBulkAction::make()
+                        ->label('تصدير سجل محدد Excel')
+                        ->icon('heroicon-o-arrow-up-tray')
+                        ->exporter(DocumentExporter::class),
                     DeleteBulkAction::make(),
                 ]),
             ]);
