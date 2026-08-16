@@ -23,6 +23,7 @@ return [
         'slug' => 'shield/roles',
         'show_model_path' => true,
         'cluster' => null,
+
         'tabs' => [
             'pages' => true,
             'widgets' => true,

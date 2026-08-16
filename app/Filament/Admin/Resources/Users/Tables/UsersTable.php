@@ -1,69 +1,67 @@
 <?php
 
 namespace App\Filament\Admin\Resources\Users\Tables;
+
+use App\Filament\Exports\UserExporter;
+use App\Filament\Imports\UserImporter;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table;
-use App\Filament\Exports\UserExporter;
 use Filament\Actions\ExportAction;
-use Filament\Actions\ImportAction;
-use App\Filament\Imports\UserImporter;
 use Filament\Actions\ExportBulkAction;
-use Filament\Tables\Filters\Filter;
+use Filament\Actions\ImportAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Storage;
-use App\Models\User;
 
 class UsersTable
 {
     public static function configure(Table $table): Table
     {
         return $table
-        ->searchPlaceholder('ابحث عن المستخدم بالاسم فقط')
+            ->searchPlaceholder('ابحث عن المستخدم بالاسم فقط')
             ->columns([
-            
+
                 TextColumn::make('name')
-                ->label('الاسم')
+                    ->label('الاسم')
                     ->searchable(),
-                    
+
                 TextColumn::make('email')
                     ->label('البريد الالكتروني'),
-                
-                    TextColumn::make('roles.name')
+
+                TextColumn::make('roles.name')
                     ->placeholder('لا توجد صلاحية')
                     ->label('الصلاحية'),
-                    
-                         
-                   TextColumn::make('created_at')
-                ->label('تاريخ الانشاء')
+
+                TextColumn::make('created_at')
+                    ->label('تاريخ الانشاء')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('updated_at')
-                ->label('تاريخ التعديل')
+                    ->label('تاريخ التعديل')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            
+
             ])
             ->headerActions([
-            ActionGroup::make([
-            
-             ExportAction::make()
-              ->label('تصدير كافة السجلات Excel')
-              ->icon('heroicon-o-arrow-up-tray')
-             ->exporter(UserExporter::class),
-            
-             ImportAction::make()
-        ->label('استيراد من ملف Excel')
-        ->importer(UserImporter::class)
-        ->icon('heroicon-o-arrow-down-tray'),
-            ])
+                ActionGroup::make([
+
+                    ExportAction::make()
+                        ->label('تصدير كافة السجلات Excel')
+                        ->icon('heroicon-o-arrow-up-tray')
+                        ->exporter(UserExporter::class),
+
+                    ImportAction::make()
+                        ->label('استيراد من ملف Excel')
+                        ->importer(UserImporter::class)
+                        ->icon('heroicon-o-arrow-down-tray'),
+                ]),
             ])
             ->filters([
                 //
@@ -71,31 +69,36 @@ class UsersTable
                     ->form([
                         DatePicker::make('created_from')->label('من تاريخ'),
                         DatePicker::make('created_until')->label('إلى تاريخ'),
-                        ])
-                        ->query(function (Builder $query, array $data): Builder {
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when($data['created_from'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
                             ->when($data['created_until'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date));
                     })
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
-                        if ($data['created_from'] ?? null) $indicators[] = 'من: ' . $data['created_from'];
-                        if ($data['created_until'] ?? null) $indicators[] = 'إلى: ' . $data['created_until'];
+                        if ($data['created_from'] ?? null) {
+                            $indicators[] = 'من: '.$data['created_from'];
+                        }
+                        if ($data['created_until'] ?? null) {
+                            $indicators[] = 'إلى: '.$data['created_until'];
+                        }
+
                         return $indicators;
                     }),
             ])
-                
+
             ->recordActions([
-                \Filament\Actions\ActionGroup::make([
+                ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
-                ->label('الإجراءات') 
-                ->button() // <--- هذه الدالة تحول الشكل إلى زر رسمي
-                ->color('') // لون الزر (تستطيع تغييرها مثل gray, success, info...)
+                    ->label('الإجراءات')
+                    ->button() // <--- هذه الدالة تحول الشكل إلى زر رسمي
+                    ->color(''), // لون الزر (تستطيع تغييرها مثل gray, success, info...)
             ])
-           ->toolbarActions([
+            ->toolbarActions([
                 BulkActionGroup::make([
                     // تم إضافة زر تصدير السجلات المحددة هنا في المكان الصحيح
                     ExportBulkAction::make()

@@ -14,8 +14,8 @@ class ListCategories extends ListRecords
     {
         return [
             CreateAction::make()
-             ->label('إضافة صنف جديد')
-            ->icon('heroicon-m-plus'),
+                ->label('إضافة صنف جديد')
+                ->icon('heroicon-m-plus'),
         ];
     }
 }

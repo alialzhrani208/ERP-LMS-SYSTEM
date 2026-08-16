@@ -20,9 +20,13 @@ class DepartmentResource extends Resource
 {
     protected static ?string $model = Department::class;
 
-protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
+
     protected static ?string $pluralModelLabel = 'الاقسام';
+
     protected static ?string $modelLabel = 'قسم';
+
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
@@ -50,9 +54,9 @@ protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuil
     {
         return [
             'index' => ListDepartments::route('/'),
-            //'create' => CreateDepartment::route('/create'),
-            //'view' => ViewDepartment::route('/{record}'),
-            //'edit' => EditDepartment::route('/{record}/edit'),
+            // 'create' => CreateDepartment::route('/create'),
+            // 'view' => ViewDepartment::route('/{record}'),
+            // 'edit' => EditDepartment::route('/{record}/edit'),
         ];
     }
 }

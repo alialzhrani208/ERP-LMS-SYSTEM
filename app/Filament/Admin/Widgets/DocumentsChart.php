@@ -5,32 +5,49 @@ namespace App\Filament\Admin\Widgets;
 use App\Models\Document;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 
 class DocumentsChart extends ChartWidget
 {
-    protected ?string $heading = 'تحليل حالة الوثائق';
-
+    protected ?string $heading = 'توزيع الوثائق حسب التصنيفات';
+protected ?string $pollingInterval = null;
     protected function getData(): array
     {
-        $today = Carbon::now();
+        // جلب أعلى 10 تصنيفات مع عدد وثائقها
+        $topCategories = Document::query()
+            ->join('categories', 'documents.category_id', '=', 'categories.id')
+            ->select('categories.name as category_name', DB::raw('COUNT(documents.id) as total'))
+            ->groupBy('categories.id', 'categories.name')
+            ->orderByDesc('total')
+            ->limit(10)
+            ->get();
 
-        // استعلام واحد لجلب جميع الحالات دفعة واحدة
-        $stats = Document::select(
-            DB::raw("COUNT(CASE WHEN expiry_date > '$today' THEN 1 END) as active"),
-            DB::raw("COUNT(CASE WHEN expiry_date < '$today' THEN 1 END) as expired"),
-            DB::raw("COUNT(CASE WHEN expiry_date IS NULL THEN 1 END) as noExpiry")
-        )->first();
+        $topCategoryNames = $topCategories->pluck('category_name');
+        
+        $otherTotal = Document::query()
+            ->join('categories', 'documents.category_id', '=', 'categories.id')
+            ->whereNotIn('categories.name', $topCategoryNames)
+            ->count();
+
+        $labels = $topCategories->pluck('category_name')->toArray();
+        $data = $topCategories->pluck('total')->toArray();
+
+        if ($otherTotal > 0) {
+            array_push($labels, 'أخرى');
+            array_push($data, $otherTotal);
+        }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'الوثائق',
-                    'data' => [$stats->active, $stats->expired, $stats->noExpiry],
-                    'backgroundColor' => ['#22c55e', '#ef4444', '#64748b'],
+                    'label' => 'عدد الوثائق',
+                    'data' => $data,
+                    'backgroundColor' => [
+                        '#3b82f6', '#1ed762', '#f97316', '#f02828', '#8b5cf6', 
+                        '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16', '#64748b'
+                    ],
                 ],
             ],
-            'labels' => ['سارية', 'منتهية', 'بدون تاريخ انتهاء'],
+            'labels' => $labels,
         ];
     }
 

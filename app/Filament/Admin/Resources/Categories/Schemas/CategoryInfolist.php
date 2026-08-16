@@ -12,19 +12,19 @@ class CategoryInfolist
         return $schema
             ->components([
                 TextEntry::make('department.name')
-                ->label('اسم القسم')
+                    ->label('اسم القسم')
                     ->placeholder('-'),
                 TextEntry::make('name')
-                  ->label('اسم التصنيف'),
+                    ->label('اسم التصنيف'),
                 TextEntry::make('description')
                     ->label('وصف')
                     ->placeholder('-')
                     ->columnSpanFull(),
                 TextEntry::make('created_at')
-                     ->label('تاريخ الانشاء')
+                    ->label('تاريخ الانشاء')
                     ->dateTime()
                     ->placeholder('-'),
-                
+
             ]);
     }
 }

@@ -2,11 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Categories\Tables;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -17,7 +18,10 @@ class CategoriesTable
     {
         return $table
             ->columns([
-                // عرض اسم القسم بدلاً من الرقم
+                TextColumn::make('id')
+                ->sortable()
+                ->searchable(), // لو حابب تبحث برقم الـ ID مباشرة
+
                 TextColumn::make('department.name')
                     ->label('القسم')
                     ->sortable()
@@ -47,20 +51,22 @@ class CategoriesTable
                     ->relationship('department', 'name')
                     ->label('تصفية حسب القسم'),
             ])
-           ->recordActions([
-                \Filament\Actions\ActionGroup::make([
+            ->recordActions([
+                ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                 ])
-                ->label('الإجراءات') 
-                ->button() // <--- هذه الدالة تحول الشكل إلى زر رسمي
-                ->color('') // لون الزر (تستطيع تغييرها مثل gray, success, info...)
+                    ->label('الإجراءات')
+                    ->button() // <--- هذه الدالة تحول الشكل إلى زر رسمي
+                    ->color(''), // لون الزر (تستطيع تغييرها مثل gray, success, info...)
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->stackedOnMobile();
+
     }
 }

@@ -14,8 +14,8 @@ class ListDocuments extends ListRecords
     {
         return [
             CreateAction::make()
-            ->label('إضافة وثيقة جديدة')
-            ->icon('heroicon-m-plus'),
+                ->label('إضافة وثيقة جديدة')
+                ->icon('heroicon-m-plus'),
         ];
     }
 }

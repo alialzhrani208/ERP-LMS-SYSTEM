@@ -12,22 +12,22 @@ class UserInfolist
         return $schema
             ->components([
                 TextEntry::make('name')
-                ->label('الاسم'),
+                    ->label('الاسم'),
                 TextEntry::make('email')
                     ->label('البريد الالكتروني'),
                 TextEntry::make('created_at')
-                ->label('تاريخ الانشاء')
+                    ->label('تاريخ الانشاء')
                     ->dateTime()
                     ->placeholder('-'),
                 TextEntry::make('updated_at')
-                ->label('تاريخ التعديل')
+                    ->label('تاريخ التعديل')
                     ->dateTime()
                     ->placeholder('-'),
-                    TextEntry::make('roles.name')
+                TextEntry::make('roles.name')
                     ->label('الصلاحية') // عنوان الحقل
                     ->badge()
                     ->placeholder('لا توجد صلاحية'),
-                
+
             ]);
     }
 }

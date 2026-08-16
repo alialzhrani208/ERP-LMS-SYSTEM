@@ -15,14 +15,25 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentResource extends Resource
 {
     protected static ?string $model = Document::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+
     protected static ?string $pluralModelLabel = 'الوثائق';
+
     protected static ?string $modelLabel = 'وثيقة';
+
+    protected static ?int $navigationSort = 3;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['department', 'category', 'user']);
+    }
+
     public static function form(Schema $schema): Schema
     {
         return DocumentForm::configure($schema);
@@ -49,9 +60,9 @@ class DocumentResource extends Resource
     {
         return [
             'index' => ListDocuments::route('/'),
-           // 'create' => CreateDocument::route('/create'),
-           // 'view' => ViewDocument::route('/{record}'),
-          // 'edit' => EditDocument::route('/{record}/edit'),
+            // 'create' => CreateDocument::route('/create'),
+            // 'view' => ViewDocument::route('/{record}'),
+            // 'edit' => EditDocument::route('/{record}/edit'),
         ];
     }
 }

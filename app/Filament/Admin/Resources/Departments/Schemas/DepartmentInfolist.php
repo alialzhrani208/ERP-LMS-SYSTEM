@@ -12,16 +12,15 @@ class DepartmentInfolist
         return $schema
             ->components([
                 TextEntry::make('name')
-                ->label('اسم القسم')
-                ,
+                    ->label('اسم القسم'),
                 TextEntry::make('code')
-                ->label('كود القسم')
+                    ->label('كود القسم')
                     ->placeholder('-'),
                 TextEntry::make('created_at')
-                ->label('تاريخ الانشاء')
+                    ->label('تاريخ الانشاء')
                     ->dateTime()
                     ->placeholder('-'),
-                
+
             ]);
     }
 }

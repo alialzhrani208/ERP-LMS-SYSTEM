@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class UserResource extends Resource
 {
@@ -24,16 +25,21 @@ class UserResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
 
     protected static ?string $pluralModelLabel = 'المستخدمين';
+
     protected static ?string $modelLabel = 'مستخدم';
+
+    protected static string|UnitEnum|null $navigationGroup = 'إدارة النظام';
 
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);
     }
-   public static function getEloquentQuery(): Builder
+
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->with(['roles']);
     }
+
     public static function infolist(Schema $schema): Schema
     {
         return UserInfolist::configure($schema);
@@ -55,9 +61,9 @@ class UserResource extends Resource
     {
         return [
             'index' => ListUsers::route('/'),
-             // 'create' => CreateUser::route('/create'),
-            //'view' => ViewUser::route('/{record}'),
-           // 'edit' => EditUser::route('/{record}/edit'),
+            // 'create' => CreateUser::route('/create'),
+            // 'view' => ViewUser::route('/{record}'),
+            // 'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

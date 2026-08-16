@@ -4,12 +4,12 @@ namespace App\Filament\Admin\Resources\Documents\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Hidden; // تأكد من استدعاء هذا الكلاس في الأعلى
+use Illuminate\Database\Eloquent\Builder; // تأكد من استدعاء هذا الكلاس في الأعلى
 
 class DocumentForm
 {
@@ -26,12 +26,16 @@ class DocumentForm
                 TextInput::make('document_number')
                     ->label('رقم الوثيقة / الصادر')
                     ->default(null)
+                    ->unique(ignoreRecord: true) // يمنع التكرار ويستثني السجل الحالي عند التعديل
+                    ->validationMessages([
+        'unique' => 'رقم المستند هذا مسجل مسبقاً، يرجى استخدام رقم اخر.',
+    ])
                     ->maxLength(100),
 
                 // قائمة منسدلة للأقسام مع خاصية الـ reactive لتحديث التصنيفات تبعاً لها
                 Select::make('department_id')
                     ->label('القسم')
-                    ->relationship('department', 'name')
+                    ->Relationship(name: 'department', titleAttribute: 'name')
                     ->required()
                     ->reactive()
                     ->searchable()
@@ -41,10 +45,9 @@ class DocumentForm
                 Select::make('category_id')
                     ->label('التصنيف')
                     ->relationship(
-                        'category', 
-                        'name', 
-                        fn (Builder $query, callable $get) => 
-                            $query->when($get('department_id'), fn ($q, $deptId) => $q->where('department_id', $deptId))
+                        'category',
+                        'name',
+                        fn (Builder $query, callable $get) => $query->when($get('department_id'), fn ($q, $deptId) => $q->where('department_id', $deptId))
                     )
                     ->required()
                     ->searchable()
@@ -72,8 +75,8 @@ class DocumentForm
                     ->label('ملاحظات أو ملخص')
                     ->default(null)
                     ->columnSpanFull(),
-                    Hidden::make('user_id')
-                  ->default(auth()->id()),
+                Hidden::make('user_id')
+                    ->default(auth()->id()),
             ]);
     }
 }

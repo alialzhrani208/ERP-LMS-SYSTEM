@@ -12,10 +12,10 @@ class DepartmentForm
         return $schema
             ->components([
                 TextInput::make('name')
-                ->label('اسم القسم')
+                    ->label('اسم القسم')
                     ->required(),
                 TextInput::make('code')
-                ->label('كود القسم')
+                    ->label('كود القسم')
                     ->default(null),
             ]);
     }

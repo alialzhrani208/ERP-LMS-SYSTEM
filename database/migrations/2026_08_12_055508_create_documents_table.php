@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('documents', function (Blueprint $table) {
-    $table->id();
-    $table->string('title'); // عنوان الوثيقة
-    $table->string('document_number')->unique()->nullable(); // رقم الوثيقة / الصادر
-    $table->foreignId('department_id')->constrained()->cascadeOnDelete(); // القسم التابع له
-    $table->foreignId('category_id')->constrained()->cascadeOnDelete(); // التصنيف
-    $table->string('attachment')->nullable(); // ملف الوثيقة المرفق
-    $table->date('document_date')->nullable(); // تاريخ الوثيقة
-    $table->date('expiry_date')->nullable(); // تاريخ انتهاء الوثيقة (للعقود والتراخيص)
-    $table->text('description')->nullable(); // ملاحظات أو ملخص
-    $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // الموظف الذي أرشفها
-    $table->timestamps();
-});
+        Schema::create('documents', function (Blueprint $table) {
+            $table->id();
+            $table->string('title'); // عنوان الوثيقة
+            $table->string('document_number')->unique()->nullable(); // رقم الوثيقة / الصادر
+            $table->foreignId('department_id')->constrained()->cascadeOnDelete(); // القسم التابع له
+            $table->foreignId('category_id')->constrained()->cascadeOnDelete(); // التصنيف
+            $table->string('attachment')->nullable(); // ملف الوثيقة المرفق
+            $table->date('document_date')->nullable(); // تاريخ الوثيقة
+            $table->date('expiry_date')->nullable(); // تاريخ انتهاء الوثيقة (للعقود والتراخيص)
+            $table->text('description')->nullable(); // ملاحظات أو ملخص
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // الموظف الذي أرشفها
+            $table->timestamps();
+        });
     }
 
     /**

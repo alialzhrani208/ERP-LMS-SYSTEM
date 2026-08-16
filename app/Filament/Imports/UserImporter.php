@@ -6,8 +6,8 @@ use App\Models\User;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
-use Illuminate\Support\Number;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Number;
 
 class UserImporter extends Importer
 {
@@ -16,7 +16,6 @@ class UserImporter extends Importer
     public static function getColumns(): array
     {
         return [
-           
 
             ImportColumn::make('name')
                 ->label('Name')
@@ -28,7 +27,6 @@ class UserImporter extends Importer
                 ->requiredMapping()
                 ->rules(['required', 'email', 'max:255']),
 
-            
             ImportColumn::make('created_at')
                 ->label('Created At')
                 ->rules(['nullable', 'date']),
@@ -41,7 +39,7 @@ class UserImporter extends Importer
 
     public function resolveRecord(): User
     {
-       return User::firstOrNew([
+        return User::firstOrNew([
             'email' => $this->data['email'],
         ], [
             'name' => $this->data['name'],
@@ -51,10 +49,10 @@ class UserImporter extends Importer
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your user import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = 'Your user import has completed and '.Number::format($import->successful_rows).' '.str('row')->plural($import->successful_rows).' imported.';
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' '.Number::format($failedRowsCount).' '.str('row')->plural($failedRowsCount).' failed to import.';
         }
 
         return $body;

@@ -14,8 +14,8 @@ class ListDepartments extends ListRecords
     {
         return [
             CreateAction::make()
-             ->label('إضافة قسم جديد')
-            ->icon('heroicon-m-plus'),
+                ->label('إضافة قسم جديد')
+                ->icon('heroicon-m-plus'),
         ];
     }
 }

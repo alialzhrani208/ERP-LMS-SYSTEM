@@ -16,7 +16,7 @@ class CategoryForm
                 // تحويل حقل القسم إلى قائمة منسدلة لجلب الأقسام المسجلة
                 Select::make('department_id')
                     ->label('القسم التابع له')
-                    ->relationship('department', 'name')
+                    ->relationship(name: 'department', titleAttribute: 'name')
                     ->searchable()
                     ->preload()
                     ->nullable(),
