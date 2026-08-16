@@ -16,9 +16,9 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Carbon;
 
 class DocumentsTable
 {
@@ -36,16 +36,13 @@ class DocumentsTable
                     ->label('رقم الوثيقة')
                     ->searchable(),
 
-                // عرض اسم القسم بدلاً من الرقم
+                // عرض اسم القسم
                 TextColumn::make('department.name')
                     ->label('القسم'),
 
-                // عرض اسم التصنيف بدلاً من الرقم
+                // عرض اسم التصنيف
                 TextColumn::make('category.name')
                     ->label('التصنيف'),
-
-                // زر عرض الملف المرفق الاحترافي
-                
 
                 TextColumn::make('document_date')
                     ->label('تاريخ الوثيقة')
@@ -59,32 +56,22 @@ class DocumentsTable
                     ->sortable(),
 
                 // عمود حالة الوثيقة الديناميكي الملون
-                TextColumn::make('document_status')
+                TextColumn::make('status')
                     ->label('حالة الوثيقة')
                     ->badge()
-                    ->getStateUsing(function ($record) {
-                        if (is_null($record->expiry_date)) {
-                            return 'لا يوجد';
-                        }
-
-                        $today = Carbon::now()->toDateString();
-                        $warningLimit = Carbon::now()->addDays(30)->toDateString();
-
-                        if ($record->expiry_date < $today) {
-                            return 'منتهية';
-                        }
-                        
-                        if ($record->expiry_date <= $warningLimit) {
-                            return 'على وشك الانتهاء';
-                        }
-
-                        return 'سارية';
-                    })
+                    ->sortable()
+                    ->searchable()
                     ->color(fn (string $state): string => match ($state) {
-                        'سارية' => 'success',
-                        'على وشك الانتهاء' => 'warning',
-                        'منتهية' => 'danger',
-                        'لا يوجد' => 'gray',
+                        'active' => 'success',
+                        'expiring_soon' => 'warning',
+                        'expired' => 'danger',
+                        'no_expiry' => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'active' => 'سارية',
+                        'expiring_soon' => 'على وشك الانتهاء',
+                        'expired' => 'منتهية',
+                        'no_expiry' => 'لا يوجد',
                     }),
 
                 TextColumn::make('created_at')
@@ -98,7 +85,8 @@ class DocumentsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    TextColumn::make('attachment')
+
+                TextColumn::make('attachment')
                     ->label('الملف')
                     ->badge()
                     ->state(fn ($record) => $record->attachment ? 'عرض الملف' : 'لا يوجد')
@@ -120,39 +108,25 @@ class DocumentsTable
                 ]),
             ])
             ->filters([
-            // فلتر حسب القسم
-            \Filament\Tables\Filters\SelectFilter::make('department')
-             ->label('القسم')
-              ->relationship('department', 'name') // يفترض أن العلاقة اسمها department في موديل الوثيقة
-             ->searchable() // يخليك تبحث في أسماء الأقسام لو كانت كثيرة
-             ->preload(), // يحمل الأقسام مسبقاً عشان تكون القائمة سريعة
-                \Filament\Tables\Filters\SelectFilter::make('status')
+                // فلتر حسب القسم
+                SelectFilter::make('department')
+                    ->label('القسم')
+                    ->relationship('department', 'name')
+                    ->searchable()
+                    ->preload(),
+
+                // فلتر حسب حالة الوثيقة (معتمد على الحقل المباشر في قاعدة البيانات بكل سرعة وكفاءة)
+                SelectFilter::make('status')
                     ->label('حالة الوثيقة')
                     ->options([
                         'active' => 'سارية',
                         'expiring_soon' => 'على وشك الانتهاء',
                         'expired' => 'منتهية',
                         'no_expiry' => 'بدون تاريخ انتهاء',
-                    ])
-                    
-                    ->query(function (Builder $query, array $data): Builder {
-                        $today = Carbon::now()->toDateString();
-                        $warningLimit = Carbon::now()->addDays(30)->toDateString();
+                    ]),
 
-                        return $query->when($data['value'], function ($query, $value) use ($today, $warningLimit) {
-                            switch ($value) {
-                                case 'active':
-                                    return $query->where('expiry_date', '>', $warningLimit);
-                                case 'expiring_soon':
-                                    return $query->whereBetween('expiry_date', [$today, $warningLimit]);
-                                case 'expired':
-                                    return $query->where('expiry_date', '<', $today);
-                                case 'no_expiry':
-                                    return $query->whereNull('expiry_date');
-                            }
-                        });
-                    }),
-            Filter::make('document_date')
+                // فلتر تاريخ الوثيقة (من - إلى)
+                Filter::make('document_date')
                     ->form([
                         DatePicker::make('from')->label('تاريخ الوثيقة من'),
                         DatePicker::make('until')->label('تاريخ الوثيقة إلى'),
@@ -163,6 +137,7 @@ class DocumentsTable
                             ->when($data['until'], fn ($q, $date) => $q->whereDate('document_date', '<=', $date));
                     }),
 
+                // فلتر تاريخ انتهاء الوثيقة (من - إلى)
                 Filter::make('expiry_date')
                     ->form([
                         DatePicker::make('from')->label('انتهاء الوثيقة من'),
@@ -173,7 +148,6 @@ class DocumentsTable
                             ->when($data['from'], fn ($q, $date) => $q->whereDate('expiry_date', '>=', $date))
                             ->when($data['until'], fn ($q, $date) => $q->whereDate('expiry_date', '<=', $date));
                     }),
-                    
             ])
             ->recordActions([
                 ActionGroup::make([

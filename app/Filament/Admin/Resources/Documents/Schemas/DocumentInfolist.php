@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\Documents\Schemas;
 
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Carbon;
 
 class DocumentInfolist
 {
@@ -50,33 +49,21 @@ class DocumentInfolist
                     ->date()
                     ->placeholder('لا يوجد'),
 
-                // حقل حالة الوثيقة الديناميكي الملون
-                TextEntry::make('document_status')
+                // حقل حالة الوثيقة (معتمد على الحقل المخزن في قاعدة البيانات مباشرة)
+                TextEntry::make('status')
                     ->label('حالة الوثيقة')
                     ->badge()
-                    ->getStateUsing(function ($record) {
-                        if (is_null($record->expiry_date)) {
-                            return 'لا يوجد';
-                        }
-
-                        $today = Carbon::now()->toDateString();
-                        $warningLimit = Carbon::now()->addDays(30)->toDateString();
-
-                        if ($record->expiry_date < $today) {
-                            return 'منتهية';
-                        }
-                        
-                        if ($record->expiry_date <= $warningLimit) {
-                            return 'على وشك الانتهاء';
-                        }
-
-                        return 'سارية';
-                    })
                     ->color(fn (string $state): string => match ($state) {
-                        'سارية' => 'success',
-                        'على وشك الانتهاء' => 'warning',
-                        'منتهية' => 'danger',
-                        'لا يوجد' => 'gray',
+                        'active' => 'success',
+                        'expiring_soon' => 'warning',
+                        'expired' => 'danger',
+                        'no_expiry' => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'active' => 'سارية',
+                        'expiring_soon' => 'على وشك الانتهاء',
+                        'expired' => 'منتهية',
+                        'no_expiry' => 'لا يوجد',
                     }),
 
                 // عرض اسم المستخدم الذي أرشف الوثيقة بدلاً من الرقم

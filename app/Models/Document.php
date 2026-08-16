@@ -22,8 +22,30 @@ class Document extends Model
         'expiry_date',
         'description',
         'user_id',
+        'status',
     ];
+protected static function boot()
+    {
+        parent::boot();
 
+        static::saving(function ($document) {
+            // يتم التحديث إذا تم تغيير تاريخ الانتهاء أو كانت الوثيقة جديدة
+            if ($document->isDirty('expiry_date') || !$document->exists) {
+                $today = now()->toDateString();
+                $warning = now()->addDays(30)->toDateString();
+
+                if (is_null($document->expiry_date)) {
+                    $document->status = 'no_expiry';
+                } elseif ($document->expiry_date < $today) {
+                    $document->status = 'expired';
+                } elseif ($document->expiry_date <= $warning) {
+                    $document->status = 'expiring_soon';
+                } else {
+                    $document->status = 'active';
+                }
+            }
+        });
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

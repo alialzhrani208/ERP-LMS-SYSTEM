@@ -28,8 +28,8 @@ class DocumentForm
                     ->default(null)
                     ->unique(ignoreRecord: true) // يمنع التكرار ويستثني السجل الحالي عند التعديل
                     ->validationMessages([
-        'unique' => 'رقم المستند هذا مسجل مسبقاً، يرجى استخدام رقم اخر.',
-    ])
+                     'unique' => 'رقم المستند هذا مسجل مسبقاً، يرجى استخدام رقم اخر.',
+                   ])
                     ->maxLength(100),
 
                 // قائمة منسدلة للأقسام مع خاصية الـ reactive لتحديث التصنيفات تبعاً لها
@@ -58,8 +58,8 @@ class DocumentForm
                     ->label('ملف الوثيقة المرفق')
                     ->disk('public')
                     ->directory('uploads')
-                    ->maxSize(10240) // 10 ميجا
-                    ->downloadable()
+                    ->maxSize(5120) // 10 ميجا
+                    ->helperText('الحد الأقصى لحجم الملف هو 5 ميجابايت.')
                     ->openable()
                     ->columnSpanFull(),
 
